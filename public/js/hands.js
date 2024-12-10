@@ -14,8 +14,10 @@ let connections;
 var w = window.innerWidth;
 var h = window.innerHeight;
 let canvas, mapMouseX, mapMouseY;
+let distanceHistory = []; // Array to store recent distances
+const smoothingWindow = 10;
 function preload() {
-    console.log("PRE");
+
   handPose = ml5.handPose();
 }
 
@@ -41,17 +43,23 @@ function draw() {
     let rightHand = hands[0];
     let leftHand = hands.length > 1 ? hands[1] : null;
 
-    let indexFinger = rightHand.keypoints[8];
-    let thumb = rightHand.keypoints[4];
-    let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y);
+    // Check distances between relevant keypoints for all fingers
+    let fingerDistances = checkFingerDistances(rightHand);
 
-    if (distance > 70 && state !== "Exhale") {
+    // Determine if the hand is closed based on the average distance of fingers
+    let averageDistance = fingerDistances.reduce((a, b) => a + b, 0) / fingerDistances.length;
+    distanceHistory.push(averageDistance);
+    if (distanceHistory.length > smoothingWindow) {
+      distanceHistory.shift(); // Keep the history within the smoothing window
+    }
+    let smoothedDistance = distanceHistory.reduce((a, b) => a + b, 0) / distanceHistory.length;
+    if (smoothedDistance > 70 && state !== "Exhale") {
       state = "Exhale";
       if (lastState === "Inhale") {
         cycleCount++;
       }
       lastState = "Exhale";
-    } else if (distance <= 70 && state !== "Inhale") {
+    } else if (smoothedDistance <= 70 && state !== "Inhale") {
       state = "Inhale";
       if (lastState === "Exhale") {
         cycleCount++;
@@ -65,10 +73,28 @@ function draw() {
 
     // Display breathing state and update visuals
     displayBreathingState(state, cycleCount);
-    drawKaleidoscope(indexFinger, thumb);
+    drawKaleidoscope(rightHand.keypoints[8], rightHand.keypoints[4]);
   } else {
     instructions(true);
   }
+}
+function checkFingerDistances(hand) {
+  let distances = [];
+  let fingerPairs = [
+    [4, 8],  // Thumb and index finger
+    [4, 12], // Thumb and middle finger
+    [4, 16], // Thumb and ring finger
+    [4, 20], // Thumb and pinky finger
+  ];
+
+  fingerPairs.forEach((pair) => {
+    let keypoint1 = hand.keypoints[pair[0]];
+    let keypoint2 = hand.keypoints[pair[1]];
+    let distance = dist(keypoint1.x, keypoint1.y, keypoint2.x, keypoint2.y);
+    distances.push(distance);
+  });
+
+  return distances;
 }
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -108,7 +134,6 @@ function displayBreathingState(state, cycleCount) {
   } else {
     text("Inhale", width / 2, 50);
   }
-  FontFace("Miniver", cursive)
   textSize(20);
   text(`Breathing Cycles: ${cycleCount}`, width / 2, height - 20);
 }

@@ -19,8 +19,7 @@ app.listen(port, () => {
 })
 app.get("/", (req, res) => {
   res.render("index", {
-    title: "Home Page",
-    description: "Welcome to our site!",
+    title: "Respiro",
   });
 });
 

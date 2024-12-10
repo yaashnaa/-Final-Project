@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "@ngrok/ngrok": "^1.4.1",
+    "animate.css": "^4.1.1",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "helmet": "^8.0.0",

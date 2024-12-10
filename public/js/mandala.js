@@ -14,6 +14,9 @@ let breathingState = "Breathe in"; // Start with "Breathe in"
 let opacity = 255;
 // Threshold for detecting blink (adjust if needed)
 let blinkThreshold = 3;
+let speedSlider; // Slider for speed control
+let speedMultiplier = 1; // Default speed multiplier
+
 
 function preload() {
   // Load the faceMesh model
@@ -32,7 +35,9 @@ function setup() {
   } else {
     console.error("Visualizer element not found");
   }
-
+  speedSlider = createSlider(0.5, 5, 1, 0.1); // Min: 0.5, Max: 5, Default: 1, Step: 0.1
+  speedSlider.position(20, 20); // Position on the screen
+  speedSlider.style("width", "200px"); // Set the slider width
   // Choose RGB color mode to match your original code
   colorMode(RGB);
 
@@ -60,6 +65,8 @@ function setup() {
 
 function draw() {
   clear();
+
+  speedMultiplier= speedSlider.value(); // Update the speed multiplier
   if (visualiserContainer.style.display === "block") {
     visualiser.display(); // Draw the visualizer
   }
@@ -101,7 +108,7 @@ function showVisualiser() {
     } else {
       console.log("not found");
     }
-  }, 12000);
+  });
 }
 
 function checkFacialPoints() {
@@ -239,7 +246,7 @@ class Visualiser {
     }
     pop();
 
-    this.gen += 0.000365; // Increment for noticeable animation
+    this.gen += 0.0003 * speedMultiplier// Increment for noticeable animation
   }
   applyGlowEffect() {
     // Rotate and draw glowing circles

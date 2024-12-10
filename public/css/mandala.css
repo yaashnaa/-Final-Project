@@ -79,7 +79,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    opacity: 0; /* Start with the visualizer hidden */
+ /* Start with the visualizer hidden */
     transition: opacity 5s ease-in; /* Smooth fade-in over 2 seconds */
   
   }

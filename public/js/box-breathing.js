@@ -16,11 +16,11 @@ function setup() {
   textSize(24);
 
   // sliders
-  sliderBreath = createSlider(30, 300, duration); 
+  sliderBreath = createSlider(1, 10, duration/60); 
   sliderBreath.position(10, height - 60);
   sliderBreath.size(150);
 
-  sliderHold = createSlider(30, 300, holdDuration); 
+  sliderHold = createSlider(1, 10, holdDuration/60); 
   sliderHold.position(10, height - 30);
   sliderHold.size(150);
 }
@@ -29,14 +29,13 @@ function draw() {
   background(10, 60, 90); // Deep blue background
 
   // Update duration values from sliders
-  duration = sliderBreath.value();
-  holdDuration = sliderHold.value();
+  duration = sliderBreath.value() *60;
+  holdDuration = sliderHold.value() * 60;
 
   // Draw instructions for sliders
   fill(255);
-  text("Breath Duration: " + duration, 200, height - 50);
-  text("Hold Duration: " + holdDuration, 200, height - 20);
-
+  text("Breath Duration: " + sliderBreath.value() + "s", 200, height - 50);
+  text("Hold Duration: " + sliderHold.value() + "s", 200, height - 20);
   // Draw the square
   noFill();
   stroke(20, 100, 140);
