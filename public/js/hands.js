@@ -8,6 +8,10 @@ let color = [255, 100, 150];
 let bodyPose;
 let poses = [];
 let rotationAngle = 0;
+let posX = 0,
+  posY = 0,
+  size = 0,
+  brightness = 255;
 let symmetry;
 let angle;
 let connections;
@@ -22,15 +26,13 @@ let inhaleConfidence = 0;
 let exhaleConfidence = 0;
 const confidenceThreshold = 8; // Number of frames required for state change
 
-
 function preload() {
-
   handPose = ml5.handPose();
 }
 
 function setup() {
   canvas = createCanvas(w, h);
-  console.log('hello ');
+  // console.log('hello ');
   angleMode(DEGREES);
   canvas.parent("canvas-container");
 
@@ -54,7 +56,8 @@ function draw() {
     let fingerDistances = checkFingerDistances(rightHand);
 
     // Determine if the hand is closed based on the average distance of fingers
-    let averageDistance = fingerDistances.reduce((a, b) => a + b, 0) / fingerDistances.length;
+    let averageDistance =
+      fingerDistances.reduce((a, b) => a + b, 0) / fingerDistances.length;
     distanceHistory.push(averageDistance);
     if (distanceHistory.length > smoothingWindow) {
       distanceHistory.shift(); // Keep the history within the smoothing window
@@ -63,13 +66,13 @@ function draw() {
       let leftIndexFinger = leftHand.keypoints[8];
       color = getColorFromPosition(leftIndexFinger);
     }
-    let smoothedDistance = distanceHistory.reduce((a, b) => a + b, 0) / distanceHistory.length;
-
+    let smoothedDistance =
+      distanceHistory.reduce((a, b) => a + b, 0) / distanceHistory.length;
 
     if (smoothedDistance > exhaleThreshold) {
       exhaleConfidence++;
       inhaleConfidence = 0;
-    
+
       if (exhaleConfidence >= confidenceThreshold && state !== "Exhale") {
         state = "Exhale";
         if (lastState === "Inhale") {
@@ -81,7 +84,7 @@ function draw() {
     } else if (smoothedDistance <= inhaleThreshold) {
       inhaleConfidence++;
       exhaleConfidence = 0;
-    
+
       if (inhaleConfidence >= confidenceThreshold && state !== "Inhale") {
         state = "Inhale";
         if (lastState === "Exhale") {
@@ -92,11 +95,7 @@ function draw() {
       }
     }
     fill(255);
-textSize(16);
-console.log(`Smoothed Distance: ${smoothedDistance.toFixed(2)}`, width / 2, 80);
-console.log(`Inhale Threshold: ${inhaleThreshold.toFixed(2)}`, width / 2, 100);
-console.log(`Exhale Threshold: ${exhaleThreshold.toFixed(2)}`, width / 2, 120);
-
+    textSize(16);
 
     // Display breathing state and update visuals
     displayBreathingState(state, cycleCount);
@@ -108,7 +107,7 @@ console.log(`Exhale Threshold: ${exhaleThreshold.toFixed(2)}`, width / 2, 120);
 function checkFingerDistances(hand) {
   let distances = [];
   let fingerPairs = [
-    [4, 8],  // Thumb and index finger
+    [4, 8], // Thumb and index finger
     [4, 12], // Thumb and middle finger
     [4, 16], // Thumb and ring finger
     [4, 20], // Thumb and pinky finger
@@ -169,14 +168,14 @@ function displayBreathingState(state, cycleCount) {
 function drawKaleidoscope(indexFinger, thumb) {
   let dynamicSymmetry = int(map(mouseX, 0, width, 3, 12));
   let angleStep = 360 / dynamicSymmetry;
-  let dynamicBrightness = map(mouseY, 0, height, 50, 255); 
+  let dynamicBrightness = map(mouseY, 0, height, 50, 255);
 
   translate(width / 2, height / 2);
   rotationAngle += 0.6;
   rotate(rotationAngle);
 
   let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y); // Distance between thumb and indexFinger
-  let sizeFactor = map(distance, 30, 200, 0.5, 2); 
+  let sizeFactor = map(distance, 30, 200, 0.5, 2);
 
   for (let i = 0; i < dynamicSymmetry; i++) {
     let angle = i * angleStep;
@@ -186,22 +185,40 @@ function drawKaleidoscope(indexFinger, thumb) {
     pop();
   }
 }
-
 function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y);
 
-  let scaleFactor = map(distance, 0, 200, 1.5, 0.5);
-  let posX = (indexFinger.x - width / 2) * scaleFactor;
-  let posY = (indexFinger.y - height / 2) * scaleFactor;
+  let scaleFactor = map(distance, 30, 200, 1, 0.9);
+  let targetPosX = (indexFinger.x - width / 2) * scaleFactor;
+  let targetPosY = (indexFinger.y - height / 2) * scaleFactor;
 
-  let size = map(distance, 30, 200, 20, 100) * sizeFactor;
-  size = constrain(size, 5, 100);
+  // Initialize posX and posY if undefined
+  if (typeof posX === "undefined") posX = targetPosX;
+  if (typeof posY === "undefined") posY = targetPosY;
 
-  // brightness controled by mouseY
+  // Smooth position using lerp
+  posX = lerp(posX, targetPosX, 0.1);
+  posY = lerp(posY, targetPosY, 0.1);
+
+  // Constrain the positions to prevent merging into one circle
+  posX = constrain(posX, -width / 4, width / 4);
+  posY = constrain(posY, -height / 4, height / 4);
+
+  // Smooth size
+  let targetSize = map(distance, 30, 200, 20, 100) * sizeFactor;
+  size = lerp(size || targetSize, targetSize, 0.1);
+  size = constrain(size, 20, 100); // Constrain size between 20 and 100
+
+  // Smooth brightness
+  let targetBrightness = map(mouseY, 0, height, 50, 255);
+  brightness = lerp(brightness || targetBrightness, targetBrightness, 0.1);
+
+  // Draw the pattern
   fill(color[0], color[1], brightness, 150);
   noStroke();
   ellipse(posX, posY, size, size);
 }
+
 
 function gotHands(results) {
   hands = results;
@@ -217,25 +234,25 @@ function getColorFromPosition(finger) {
   return [r, g, b];
 }
 
-  function adjustThresholds() {
-    if (distanceHistory.length > 0) {
-      let minDistance = Math.min(...distanceHistory);
-      let maxDistance = Math.max(...distanceHistory);
+function adjustThresholds() {
+  if (distanceHistory.length > 0) {
+    let minDistance = Math.min(...distanceHistory);
+    let maxDistance = Math.max(...distanceHistory);
 
-      inhaleThreshold = minDistance + (maxDistance - minDistance) * 0.3;
-      exhaleThreshold = minDistance + (maxDistance - minDistance) * 0.7;
+    inhaleThreshold = minDistance + (maxDistance - minDistance) * 0.3;
+    exhaleThreshold = minDistance + (maxDistance - minDistance) * 0.7;
 
-      // Ensure thresholds are valid
-      if (inhaleThreshold >= exhaleThreshold) {
-        let midPoint = (inhaleThreshold + exhaleThreshold) / 2;
-        inhaleThreshold = midPoint - 5;
-        exhaleThreshold = midPoint + 5;
-      }
+    // Ensure thresholds are valid
+    if (inhaleThreshold >= exhaleThreshold) {
+      let midPoint = (inhaleThreshold + exhaleThreshold) / 2;
+      inhaleThreshold = midPoint - 5;
+      exhaleThreshold = midPoint + 5;
+    }
 
-      // Add a minimum gap between thresholds
-      const minThresholdGap = 10;
-      if (exhaleThreshold - inhaleThreshold < minThresholdGap) {
-        exhaleThreshold = inhaleThreshold + minThresholdGap;
-      }
+    // Add a minimum gap between thresholds
+    const minThresholdGap = 10;
+    if (exhaleThreshold - inhaleThreshold < minThresholdGap) {
+      exhaleThreshold = inhaleThreshold + minThresholdGap;
     }
   }
+}
