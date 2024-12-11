@@ -4,22 +4,23 @@ let microphone, meter;
 let lowpass = 0;
 const ALPHA = 0.5;
 const CANDLETHRESHOLD = 0.05;
-let remainingCycles = 0; 
-let breathingCompleted = false; 
+let remainingCycles = 0;
+let breathingCompleted = false;
 // Breathing Variables
-let phase = "inhale"; 
+let phase = "inhale";
 let phaseTime = 0;
-const inhaleDuration = 4000; 
-const exhaleDuration = 6000; 
+const inhaleDuration = 4000;
+const exhaleDuration = 6000;
 let flameStartY;
 // Candle Particles
 let particles = [];
+let exerciseStarted = false;
 const MAX_PART_COUNT = 100;
 let particleCount = MAX_PART_COUNT;
 // Button and Instruction Elements
-const startButton = document.getElementById("start-button");
+const startButton1 = document.getElementById("start-button");
 const instructionsElement = document.getElementById("instructions");
-const cycleInput=  document.getElementById("cycles");
+const cycleInput = document.getElementById("cycles");
 
 let candleImg;
 
@@ -28,17 +29,16 @@ function preload() {
 }
 
 function setup() {
-
   let canvas = createCanvas(800, 600);
-  canvas.parent("container"); 
+  canvas.parent("container");
   let candleCenterY = height / 2 + 650;
   let candleHeight = 800;
-  let candleTopY = candleCenterY - candleHeight / 2; 
-  flameStartY = candleTopY - 100; 
+  let candleTopY = candleCenterY - candleHeight / 2;
+  flameStartY = candleTopY - 100;
 
   // Generate Particles
   for (let i = 0; i < MAX_PART_COUNT; i++) {
-    particles.push(new FlameParticle(width / 2, flameStartY)); 
+    particles.push(new FlameParticle(width / 2, flameStartY));
   }
   mic = new p5.AudioIn();
   mic.start();
@@ -46,25 +46,26 @@ function setup() {
   fft.setInput(mic);
 
   // Handle Button Click to Start
-  startButton.addEventListener("click", () => {
+  startButton1.addEventListener("click", () => {
     const cycleInput = document.getElementById("cycles");
-    remainingCycles = parseInt(cycleInput.value) || 0; 
-    breathingCompleted = false; 
-    startButton.style.display = "none"; 
-    cycleInput.style.display = "none"; 
+    remainingCycles = parseInt(cycleInput.value) || 0;
+    breathingCompleted = false;
+    startButton1.style.display = "none";
+    cycleInput.style.display = "none";
+    exerciseStarted = true;
     instructionsElement.textContent =
       "Inhale deeply through your nose, filling your lungs.";
     requestAudioAccess();
   });
-  
 }
 
 function draw() {
-    background(0);
-  
+  background(11, 5, 8);
+
+  if (exerciseStarted) {
     if (!breathingCompleted) {
       phaseTime += deltaTime;
-  
+
       if (phase === "inhale" && phaseTime >= inhaleDuration) {
         phase = "exhale";
         phaseTime = 0;
@@ -79,35 +80,43 @@ function draw() {
         if (remainingCycles <= 0) {
           breathingCompleted = true;
           instructionsElement.textContent = "Breathing exercise complete.";
-          startButton.style.display = "block"; 
-          cycleInput.style.display = "block"; 
-          particles = []; // Clear all particles
+          startButton1.style.display = "block";
+          cycleInput.style.display = "block";
+          // particles = []; // Clear all particles
         }
       }
     }
-  
-    // candle image
-    imageMode(CENTER);
-    image(candleImg, width / 2, height / 2 + 100, 500, 800);
-  
-    if (!breathingCompleted && phase === "exhale" && microphone && meter && isBlowing()) {
-      if (particleCount > 0) particleCount -= 1;
-    }
-  
-    if (!breathingCompleted && particleCount < MAX_PART_COUNT && phase !== "exhale") {
-      particleCount += 1;
-    }
-  
-
-    if (!breathingCompleted) {
-      for (let i = 0; i < particleCount; i++) {
-        particles[i].update();
-        particles[i].draw();
-      }
-    }
-  
   }
-  
+
+  // candle image
+  imageMode(CENTER);
+  image(candleImg, width / 2, height / 2 + 100, 500, 800);
+
+  if (
+    !breathingCompleted &&
+    phase === "exhale" &&
+    microphone &&
+    meter &&
+    isBlowing()
+  ) {
+    if (particleCount > 0) particleCount -= 1;
+  }
+
+  if (
+    !breathingCompleted &&
+    particleCount < MAX_PART_COUNT &&
+    phase !== "exhale"
+  ) {
+    particleCount += 1;
+  }
+
+  if (!breathingCompleted) {
+    for (let i = 0; i < particleCount; i++) {
+      particles[i].update();
+      particles[i].draw();
+    }
+  }
+}
 
 // Particle Class
 class FlameParticle {

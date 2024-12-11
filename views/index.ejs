@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
+    <title>Respiro</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
@@ -12,41 +12,57 @@
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
-    <h1 class="animate__fadeIn">Respiro</h1>
-    <div class="sub-heading">Meditation That Reacts to You.</div>
-    <li><a href="/candle">Candle</a></li>
-    <li><a href="/box">Box</a></li>
-    <li><a href="/mandala">Mandala</a></li>
-    <li><a href="/kaledioscope">kaledioscope</a></li>
-    <script src="/js/sketch.js"></script>
-
-    <div class="options">
-      <div class="button-33"> 
-        <div class="info">
-          cbkhbceukjv
-        </div>
+    <div class="header">
+      <div class="heading-text">
+        <h1 class="animate__animated animate__fadeIn">Respiro</h1>
+        <div class="sub-heading">Meditation That Reacts to You.</div>
       </div>
-      <div class="button-33"> 
-        <div class="info">
-          cbkhbceukjv
-        </div>
-      </div>
-      <div class="button-33"> 
-        <div class="info">
-          cbkhbceukjv
-        </div>
-      </div>
-      <div class="button-33"> 
-        <div class="info">
-          cbkhbceukjv
-        </div>
-      </div>
-      <div class="button-33"> 
-        <div class="info">
-          cbkhbceukjv
-        </div>
+      <div id="embed-iframe">
+        <iframe
+          style="border-radius: 12px"
+          src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZqd5JICZI0u?utm_source=generator&theme=0"
+          width="50%"
+          height="30%"
+          frameBorder="0"
+          allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        ></iframe>
       </div>
     </div>
 
+    <div id="grid-container" class="animate__fadeInUp">
+      <!-- Candle Section -->
+      <div class="grid-item">
+        <img src="/images/candleImg.png" alt="Candle" />
+        <h3>Candle</h3>
+        <a href="/candle" class="link">Explore Candle</a>
+      </div>
+
+      <!-- Box Section -->
+      <div class="grid-item">
+        <img src="/images/box.png" alt="Box" />
+        <h3>Box</h3>
+        <a href="/box" class="link">Explore Box</a>
+      </div>
+
+      <!-- Mandala Section -->
+      <div class="grid-item">
+        <img src="/images/mandala.png" alt="Mandala" />
+        <h3>Mandala</h3>
+        <a href="/mandala" class="link">Explore Mandala</a>
+      </div>
+
+      <!-- Kaleidoscope Section -->
+      <div class="grid-item">
+        <img src="/images/kaleidoscope.png" alt="Kaleidoscope" />
+        <h3>Kaleidoscope</h3>
+        <a href="/kaledioscope" class="link">Explore Kaleidoscope</a>
+      </div>
+    </div>
+    <div class="mouse">Try pressing and moving around the mouse!</div>
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
+    <script src="/js/sketch.js"></script>
   </body>
 </html>

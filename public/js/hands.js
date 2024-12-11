@@ -15,7 +15,14 @@ var w = window.innerWidth;
 var h = window.innerHeight;
 let canvas, mapMouseX, mapMouseY;
 let distanceHistory = []; // Array to store recent distances
-const smoothingWindow = 10;
+const smoothingWindow = 15;
+let inhaleThreshold = 100; // Starting thresholds
+let exhaleThreshold = 150;
+let inhaleConfidence = 0;
+let exhaleConfidence = 0;
+const confidenceThreshold = 8; // Number of frames required for state change
+
+
 function preload() {
 
   handPose = ml5.handPose();
@@ -36,8 +43,8 @@ function setup() {
 }
 
 function draw() {
-  background("#00111a");
-
+  background(11, 5, 8);
+  adjustThresholds();
   if (hands.length > 0) {
     instructions(false);
     let rightHand = hands[0];
@@ -52,24 +59,41 @@ function draw() {
     if (distanceHistory.length > smoothingWindow) {
       distanceHistory.shift(); // Keep the history within the smoothing window
     }
+    
     let smoothedDistance = distanceHistory.reduce((a, b) => a + b, 0) / distanceHistory.length;
-    if (smoothedDistance > 70 && state !== "Exhale") {
-      state = "Exhale";
-      if (lastState === "Inhale") {
-        cycleCount++;
+
+
+    if (smoothedDistance > exhaleThreshold) {
+      exhaleConfidence++;
+      inhaleConfidence = 0;
+    
+      if (exhaleConfidence >= confidenceThreshold && state !== "Exhale") {
+        state = "Exhale";
+        if (lastState === "Inhale") {
+          cycleCount++;
+        }
+        lastState = "Exhale";
+        exhaleConfidence = 0; // Reset after state change
       }
-      lastState = "Exhale";
-    } else if (smoothedDistance <= 70 && state !== "Inhale") {
-      state = "Inhale";
-      if (lastState === "Exhale") {
-        cycleCount++;
+    } else if (smoothedDistance <= inhaleThreshold) {
+      inhaleConfidence++;
+      exhaleConfidence = 0;
+    
+      if (inhaleConfidence >= confidenceThreshold && state !== "Inhale") {
+        state = "Inhale";
+        if (lastState === "Exhale") {
+          cycleCount++;
+        }
+        lastState = "Inhale";
+        inhaleConfidence = 0; // Reset after state change
       }
-      lastState = "Inhale";
     }
-    if (leftHand) {
-      let leftIndexFinger = leftHand.keypoints[8];
-      color = getColorFromPosition(leftIndexFinger);
-    }
+    fill(255);
+textSize(16);
+console.log(`Smoothed Distance: ${smoothedDistance.toFixed(2)}`, width / 2, 80);
+console.log(`Inhale Threshold: ${inhaleThreshold.toFixed(2)}`, width / 2, 100);
+console.log(`Exhale Threshold: ${exhaleThreshold.toFixed(2)}`, width / 2, 120);
+
 
     // Display breathing state and update visuals
     displayBreathingState(state, cycleCount);
@@ -168,7 +192,7 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   let posY = (indexFinger.y - height / 2) * scaleFactor;
 
   let size = map(distance, 30, 200, 20, 100) * sizeFactor;
-  size = constrain(size, 5, 200);
+  size = constrain(size, 5, 100);
 
   // brightness controled by mouseY
   fill(color[0], color[1], brightness, 150);
@@ -189,3 +213,26 @@ function getColorFromPosition(finger) {
 
   return [r, g, b];
 }
+
+  function adjustThresholds() {
+    if (distanceHistory.length > 0) {
+      let minDistance = Math.min(...distanceHistory);
+      let maxDistance = Math.max(...distanceHistory);
+
+      inhaleThreshold = minDistance + (maxDistance - minDistance) * 0.3;
+      exhaleThreshold = minDistance + (maxDistance - minDistance) * 0.7;
+
+      // Ensure thresholds are valid
+      if (inhaleThreshold >= exhaleThreshold) {
+        let midPoint = (inhaleThreshold + exhaleThreshold) / 2;
+        inhaleThreshold = midPoint - 5;
+        exhaleThreshold = midPoint + 5;
+      }
+
+      // Add a minimum gap between thresholds
+      const minThresholdGap = 10;
+      if (exhaleThreshold - inhaleThreshold < minThresholdGap) {
+        exhaleThreshold = inhaleThreshold + minThresholdGap;
+      }
+    }
+  }

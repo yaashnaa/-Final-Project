@@ -4,56 +4,65 @@ let timer = 0;
 let duration = 60;
 let holdDuration = 60; 
 let phases = ['INHALE', 'HOLD', 'EXHALE', 'HOLD'];
-
+let breathText, holdText
 let phaseIndex = 0; 
 let sliderBreath, sliderHold; // Sliders for breath and hold duration
 
 function setup() {
-  createCanvas(600, 600);
+  createCanvas(600, 500);
   circleX = width / 2 - squareSize / 2; // Start at the left side
   circleY = height / 2 - squareSize / 2;
   textAlign(CENTER, CENTER);
   textSize(24);
-
+  const sliders= selectAll('.slider');
+  const durationLabels = selectAll('.duration-label');
   // sliders
-  sliderBreath = createSlider(1, 10, duration/60); 
-  sliderBreath.position(10, height - 60);
-  sliderBreath.size(150);
+  sliderBreath = createSlider(1, 10, duration / 60);
+  // sliderBreath.position(200, height + 60);
+  sliderBreath.style('width', '200px');
+  sliderBreath.parent(sliders[0]);
 
-  sliderHold = createSlider(1, 10, holdDuration/60); 
-  sliderHold.position(10, height - 30);
-  sliderHold.size(150);
+  sliderHold = createSlider(1, 10, holdDuration / 60);
+  // sliderHold.position(200, height + 100);
+  sliderHold.style('width', '200px');
+  sliderHold.parent(sliders[1]);
+
+  breathText = createDiv('Breath Duration: ' + sliderBreath.value() + 's');
+  breathText.class('duration-label')
+  holdText = createDiv('Hold Duration: ' + sliderHold.value() + 's');
+  holdText.class('duration-label')
+  breathText.parent(durationLabels[0]);
+  holdText.parent(durationLabels[1]);
+  
 }
 
 function draw() {
-  background(10, 60, 90); // Deep blue background
+  background(11, 5, 8); // Deep blue background
 
   // Update duration values from sliders
   duration = sliderBreath.value() *60;
   holdDuration = sliderHold.value() * 60;
-
-  // Draw instructions for sliders
-  fill(255);
-  text("Breath Duration: " + sliderBreath.value() + "s", 200, height - 50);
-  text("Hold Duration: " + sliderHold.value() + "s", 200, height - 20);
+  breathText.html('Breath Duration: ' + sliderBreath.value() + 's');
+  holdText.html('Hold Duration: ' + sliderHold.value() + 's');
   // Draw the square
   noFill();
-  stroke(20, 100, 140);
+  stroke(101, 165, 176);
   strokeWeight(8);
   rectMode(CENTER);
+  textFont('Gowun Dodum')
   for (let i = 0; i < 3; i++) {
-    rect(width / 2, height / 2, squareSize + i * 20, squareSize + i * 20);
+    rect(width / 2, height / 2, squareSize + i * 25, squareSize + i * 25);
   }
 
 
-  fill(180, 220, 230);
+  fill(255);
   noStroke();
   ellipse(circleX, circleY, 30, 30);
 let currentPhase = phases[phaseIndex];
 
   fill(255);
   noStroke();
-  text(currentPhase, width / 2, height - 100);
+  text(currentPhase, width / 2, 50);
 
   timer++;
   let progress;

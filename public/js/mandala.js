@@ -17,7 +17,7 @@ let blinkThreshold = 3;
 let speedSlider; // Slider for speed control
 let speedMultiplier = 1; // Default speed multiplier
 
-
+let slider
 function preload() {
   // Load the faceMesh model
   faceMesh = ml5.faceMesh(options);
@@ -28,7 +28,7 @@ function setup() {
   textFont("Satisfy");
 
   visualiserContainer = document.getElementById("visualiser");
-
+  slider= document.getElementById("slider");
   // Ensure element exists
   if (visualiserContainer) {
     console.log("Visualizer element found"); // Log for debugging
@@ -36,11 +36,10 @@ function setup() {
     console.error("Visualizer element not found");
   }
   speedSlider = createSlider(0.5, 5, 1, 0.1); // Min: 0.5, Max: 5, Default: 1, Step: 0.1
-  speedSlider.position(20, 20); // Position on the screen
   speedSlider.style("width", "200px"); // Set the slider width
   // Choose RGB color mode to match your original code
   colorMode(RGB);
-
+  speedSlider.parent(slider); // Attach the slider to the visualizer div
   // Create the webcam video and hide it
   video = createCapture(VIDEO);
   video.size(640, 480);
@@ -53,17 +52,13 @@ function setup() {
   canvas.parent(visualiserContainer); // Attach the canvas to the visualizer div
 
   // Set the initial visualizer
-  visualiser = new Visualiser(204, 232, 204);
-
-  // Hide the canvas initially until the "Ready?" text fades in
+  visualiser = new Visualiser(114, 166, 144);
   visualiserContainer.style.display = "none";
-  //   setTimeout(() => {
-  //     visualiserContainer.style.display = "block";
-  //     console.log('displayed');
-  //   }, 12000);
+
 }
 
 function draw() {
+  background(11, 5, 8); // Deep blue background
   clear();
 
   speedMultiplier= speedSlider.value(); // Update the speed multiplier
@@ -72,29 +67,7 @@ function draw() {
   }
   timer += deltaTime;
 
-  // Every 1000 milliseconds (1 second), update the countdown
-  if (timer >= 900) {
-    timer = 0; // Reset the timer
-    countdown--; // Decrement the countdown
-
-    if (countdown < 0) {
-      // Switch between expanding and contracting
-      expanding = !expanding;
-      countdown = 5; // Reset countdown to 5 seconds
-
-      // Update breathing state text
-      breathingState = expanding ? "Breathe in" : "Breathe out";
-      opacity = 255; // Reset opacity for the new phase
-    }
-  }
-
-  // Decrease opacity for fade effect
-  opacity -= 5;
   showVisualiser();
-  // Draw breathing state and countdown text
-  drawTextWithEffects(breathingState, width / 2, height / 6, opacity, 64);
-  drawTextWithEffects(countdown, width / 2, height / 4.5, opacity, 48);
-
   checkFacialPoints();
 }
 function showVisualiser() {
@@ -171,36 +144,30 @@ function checkFacialPoints() {
     // Facial expression handling
     if (eyeToEyebrowDist < 20 && eyeToEyebrowDist > 10) {
       console.log("frowning");
-      visualiser.setColor(204, 102, 102); // Set jagged colors
+      visualiser.setColor(255, 150, 150); // Set jagged colors
     } else if (noseScrunchDist < 20) {
       //   console.log("Nose scrunched");
       visualiser.setColor(255, 150, 150); // Set specific colors for nose scrunch
     } else if (mouthHorizontalDist < 40) {
       //   console.log("Mouth moved sideways");
-      visualiser.setColor(204, 102, 102); // Set specific colors for sideways mouth movement
+      visualiser.setColor(255, 150, 150); // Set specific colors for sideways mouth movement
     } else if (eyeToEyebrowDist > 40) {
       console.log("raised eyebrows - stressed/surprised");
-      visualiser.setColor(204, 102, 102); // Set jagged colors
+      visualiser.setColor(255, 150, 150); // Set jagged colors
     } else if (mouthOpenDist < 10) {
       console.log("smooth - relaxed");
-      visualiser.setColor(204, 232, 204); // Set smooth colors
+      visualiser.setColor(114, 166, 144); // Set smooth colors
     } else if (mouthOpenDist > 15) {
       console.log("mouth open - jagged");
-      visualiser.setColor(204, 102, 102); // Set jagged colors
+      visualiser.setColor(255, 150, 150); // Set jagged colors
     } else if (mouthVerticalDist > 15) {
       //   console.log("Mouth moved up or down");
-      visualiser.setColor(204, 102, 102); // Set specific colors for vertical mouth movement
+      visualiser.setColor(255, 150, 150); // Set specific colors for vertical mouth movement
     } else {
       console.log("neutral");
-      visualiser.setColor(204, 232, 204); // Set neutral/smooth colors
+      visualiser.setColor(114, 166, 144); // Set neutral/smooth colors
     }
   }
-}
-function drawTextWithEffects(textContent, x, y, opacity, size) {
-  fill(255, 255, 255, opacity); // White text with fading opacity
-  textAlign(CENTER, CENTER);
-  textSize(size);
-  text(textContent, x, y);
 }
 
 class Visualiser {
@@ -227,7 +194,7 @@ class Visualiser {
 
   display() {
     // let scaleFactor = map(mouseX, 0, width, 0.5, 1.5);
-    this.drawBackground();
+  
     this.applyGlowEffect();
 
     stroke(this.r, this.g, this.b);
@@ -263,16 +230,6 @@ class Visualiser {
 
     pop();
   }
-
-  drawBackground() {
-    // Create a gradient background
-    for (let y = 0; y < height; y++) {
-      let inter = map(y, 0, height, 0, 1);
-      let c = lerpColor(color(30, 30, 60), color(10, 10, 30), inter);
-      stroke(c);
-      line(0, y, width, y);
-    }
-  }
 }
 
 // Callback function when faceMesh outputs data
@@ -284,3 +241,4 @@ function windowResized() {
   visualiser.x = width / 2;
   visualiser.y = height / 2;
 }
+

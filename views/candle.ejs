@@ -18,26 +18,43 @@
   </head>
 
   <body>
-
-    <div id="visualiser"></div>
-    <div id='container'>
-        <div id="controls">
-            <div id="cycle-input"> 
-                <label for="cycles">Number of Breathing Cycles:</label>
-                <input type="number" id="cycles" min="1" value="3" />
-            </div>
-         
-            <button id="start-button">Start Breathing Exercise</button>
-          </div>
-          <div id="instructions">Click the button below to start the breathing exercise.</div>
-          
-        <!-- FLAME -->
-        <canvas id='canvas'></canvas>
-    
+    <div id="instructionModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Welcome to the Breathing Exercise</h2>
+        <p>Follow the steps below to begin your exercise:</p>
+        <ol>
+          <li>Enter the number of breathing cycles you want to complete.</li>
+          <li>Click the "Start Breathing Exercise" button.</li>
+          <li>Follow the on-screen instructions for inhale and exhale.</li>
+          <li>Try to blow out the candle during the exhale phase!</li>
+        </ol>
+        <p>
+          This exercise uses your microphone to detect your breath. Please
+          ensure you grant microphone access when prompted.
+        </p>
+        <button id="candleStartButton">Got It, Let’s Begin</button>
+      </div>
     </div>
-      
-    
-    <script src="/js/candle.js"></script>
+    <h1>Candle Breathing</h1>
+    <div id="container">
+      <div id="instructions">
+        Click the button below to start the breathing exercise.
+      </div>
+      <div id="controls">
+        <div id="cycle-input">
+          <label for="cycles">Number of Breathing Cycles:</label>
+          <input type="number" id="cycles" min="1" value="3" />
+        </div>
 
+        <button id="start-button">Start Breathing Exercise</button>
+      </div>
+   
+
+      <!-- FLAME -->
+      <canvas id="canvas"></canvas>
+    </div>
+    <script src="/js/candleInst.js"></script>
+    <script src="/js/candle.js"></script>
   </body>
 </html>
