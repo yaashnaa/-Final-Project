@@ -59,7 +59,10 @@ function draw() {
     if (distanceHistory.length > smoothingWindow) {
       distanceHistory.shift(); // Keep the history within the smoothing window
     }
-    
+    if (leftHand) {
+      let leftIndexFinger = leftHand.keypoints[8];
+      color = getColorFromPosition(leftIndexFinger);
+    }
     let smoothedDistance = distanceHistory.reduce((a, b) => a + b, 0) / distanceHistory.length;
 
 
