@@ -43,11 +43,13 @@ body {
   gap: 10px;
   position: absolute;
   bottom: 10%;
+  z-index: 999;
 }
 .slider{
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 999;
 }
 /* Slider Labels */
 .slider-label {
@@ -66,6 +68,7 @@ input[type="range"] {
   outline: none;
   opacity: 0.8;
   transition: opacity 0.2s;
+  z-index: 999;
 }
 h1{
   text-align: center;
@@ -105,8 +108,9 @@ input[type="range"]::-moz-range-thumb {
   display: none; /* Hidden by default */
   position: fixed;
   z-index: 1000;
-  left: 0;
-  top: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -175,6 +179,7 @@ li{
   vertical-align: baseline;
   white-space: nowrap;
   margin: 0 auto;
+  color: black;
 }
 
 #start-button :hover,

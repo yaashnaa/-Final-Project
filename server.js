@@ -15,7 +15,7 @@ app.set("views", path.join(__dirname, "views")); // Ensure 'views' folder exists
 // Serve static files (CSS, images, JS)
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`listening on port ${port}`)
 })
 app.get("/", (req, res) => {
   res.render("index", {

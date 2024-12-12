@@ -26,7 +26,7 @@ function setup() {
   rows = floor(height / scl);
   fr = createP();
 
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 150; i++) {
     particles[i] = new Particle(random(width), random(height));
   }
   

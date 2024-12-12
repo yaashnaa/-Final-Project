@@ -59,6 +59,7 @@ function affirmationSketch(p) {
     "I celebrate my achievements.",
     "I trust in my ability to persevere.",
   ];
+  let mic;
   let affirmationBtns;
   let affirmationCount = 0;
   let currentAffirmation = ""; // Current affirmation being displayed
@@ -81,7 +82,20 @@ function affirmationSketch(p) {
   };
 
   p.setup = function () {
-    canvas = p.createCanvas(600, 400);
+    let canvas = p.createCanvas(600, 400);
+    mic = new p5.AudioIn();
+    mic.start(
+      () => {
+        console.log("Microphone started successfully!");
+      },
+      (err) => {
+        console.error("Microphone error:", err);
+      }
+    );
+    let n = 0.5;
+    if (sound && sound.isLoaded()) {
+      sound.setVolume(n);
+    }
     p.background(200);
     canvas.parent("container");
     speech = new p5.Speech();
@@ -92,20 +106,35 @@ function affirmationSketch(p) {
     speechRec = new p5.SpeechRec("en-US", gotSpeech);
     speechRec.continuous = true; // Keep listening continuously
     speechRec.interimResults = false; // Only capture finalized results
+    speechRec.start();
 
     // Create buttons for interaction
     let startButton = p.createButton("Start Practicing");
     startButton.addClass("button-33");
-    //   startButton.position(width/2, 350);
-    startButton.mousePressed(startListening);
+
+    // Add event listener with a flag to prevent multiple clicks
+    let hasStarted = false; // Track if the button has already been clicked
+    startButton.mousePressed(() => {
+
+      if (!hasStarted) {
+        listening = true; // Start listening
+        showAndSpeakAffirmation(); // Show the first affirmation
+        hasStarted = true; // Mark as started
+        startButton.attribute("disabled", "true"); // Disable the button visually
+      }
+    });
+
     startButton.parent(affirmationBtns);
+
     let stopButton = p.createButton("Stop Listening");
     //   stopButton.position(width/2, 350);
-    stopButton.mousePressed(stopListening);
+    stopButton.mousePressed(() => {
+      stopListening();
+      hasStarted = false;
+      startButton.removeAttribute("disabled");
+    });
     stopButton.parent(affirmationBtns);
     stopButton.addClass("button-33");
-
-    showRandomAffirmation();
   };
   p.draw = function () {
     p.background(listening ? p.color(114, 166, 144) : 220); // Green when listening
@@ -114,7 +143,12 @@ function affirmationSketch(p) {
     p.textSize(24);
     p.fill(0);
     p.textAlign(p.CENTER, p.CENTER);
-    p.text("Please repeat:", width / 2, height / 2 - 100);
+
+    if (listening) {
+      p.text("Please repeat:", width / 2, height / 2 - 100);
+    } else {
+      p.text("Press Start button to begin", width / 2, height / 2 - 100);
+    }
     p.text(currentAffirmation, width / 2, height / 2 - 20);
     p.textFont("Gowun Dodum");
     // Display the user’s spoken text
@@ -129,89 +163,105 @@ function affirmationSketch(p) {
       height / 2 + 80
     );
   };
-  function startListening() {
-    startSpeaking();
-    console.log(currentAffirmation);
-  }
 
-  function startSpeaking() {
-    // background('green');
-    // console.log("Speaking: " + currentAffirmation);
-    let voices = speech.voices;
-    let voice = voices[1];
-    speech.setVoice("SpeechSynthesisVoice");
-    speech.setRate(0.3);
-    speech.setPitch(1);
-    speech.speak(currentAffirmation);
+  function showAndSpeakAffirmation() {
+    currentAffirmation = p.random(affirmations);
+    console.log("New Affirmation:", currentAffirmation);
+    
+    // Before speaking the new affirmation, stop listening if it's running.
+    // This prevents capturing the TTS as input.
+    if (listening) {
+      listening = false;
+      // speechRec.stop(); // Stop current recognition if running
+    }
+  
+    speakAffirmation(currentAffirmation);
+  }
+  
+  function speakAffirmation(affirmation) {
+    feedback = "";
+  
     speech.onEnd = () => {
-      // console.log("Speech ended");
-      if (!listening) {
-        listening = true;
-        speechRec.start();
-        console.log(currentAffirmation);
-      } else {
-        currentAffirmation = currentAffirmation;
-        // console.log("Speech ended, but we are already listening");
+      console.log("Speech ended for:", affirmation);
+  
+      // After TTS is done, we want to start listening again.
+      listening = true; 
+      try {
+        speechRec.start(); // Restart speech recognition after TTS finishes
+        console.log("Speech recognition restarted.");
+      } catch (err) {
+        console.error("Error restarting SpeechRec:", err);
       }
     };
+  
+    speech.setRate(0.6);
+    speech.setPitch(1);
+    speech.speak(affirmation);
+    console.log("Speaking:", affirmation);
   }
-
-  // Stop listening for speech
-  function stopListening() {
-    listening = false;
-  }
-
+  
   function gotSpeech() {
-    if (speechRec.resultValue) {
-      inputText = speechRec.resultString.trim(); // Trim whitespace for accuracy
-
-      const normalizedInput = normalizeInput(inputText);
-      const normalizedAffirmation = normalizeInput(currentAffirmation);
-      if (isMatch(normalizedInput, normalizedAffirmation)) {
-        // startSpeaking(currentAffirmation);
-        // console.log(currentAffirmation);
-        // console.log("Affirmation completed!");
-        affirmationCount++;
-        showRandomAffirmation(); // Move to the next affirmation
-      } else {
-        feedback = "Try again";
-        console.log(
-          `Mismatch: Input="${normalizedInput}" vs Affirmation="${normalizedAffirmation}"`
-        );
+    console.log("GotSpeech triggered.");
+    console.log("Result Value:", speechRec.resultValue);
+    console.log("Result String:", speechRec.resultString);
+  
+    if (speechRec.resultValue && listening) {
+      inputText = speechRec.resultString.trim();
+      console.log("Recognized Text:", inputText);
+  
+      if (inputText.length === 0) {
+        console.log("Empty input recognized. Not proceeding.");
+        return;
       }
+  
+      if (isMatch(inputText, currentAffirmation)) {
+        feedback = "Great job! Moving to the next affirmation.";
+        console.log("Affirmation matched!");
+        affirmationCount++;
+        showAndSpeakAffirmation(); // Move to the next affirmation
+      } else {
+        feedback = "Please try again. Repeat the affirmation exactly.";
+        console.log(`Mismatch: Input="${inputText}" vs Affirmation="${currentAffirmation}"`);
+      }
+    } else {
+      console.log("No valid speech recognized or listening disabled.");
     }
   }
+  
+  function stopListening() {
+    listening = false;
+    feedback = "Listening stopped.";
+    console.log("Listening stopped.");
+  }
+  
+
+  function isMatch(input, affirmation) {
+    const normalizedInput = normalizeInput(input);
+    const normalizedAffirmation = normalizeInput(affirmation);
+    return normalizedInput === normalizedAffirmation;
+  }
+  function stopListening() {
+    listening = false;
+
+    //   speechRec.stop();
+  }
+
   function normalizeInput(text) {
     return text
       .toLowerCase()
-      .normalize("NFC") // Normalize to NFC form
+      .normalize("NFC")
       .replace(/[.,!?]/g, "");
   }
-
-  function isMatch(input, affirmation) {
-    const keywords = affirmation.split(" ");
-    for (const keyword of keywords) {
-      if (input.includes(keyword)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  // Show a random affirmation
   function showRandomAffirmation() {
     currentAffirmation = p.random(affirmations);
-    // console.log("Next Affirmation: " + currentAffirmation);
+    console.log("Next Affirmation: " + currentAffirmation);
 
-    // Schedule the speaking of the new affirmation after a short delay
-    setTimeout(() => {
-      startSpeaking(currentAffirmation);
-    }, 500);
     //   console.log("Next Affirmation: " + currentAffirmation);
   }
   window.onload = function () {
     const musicButton = document.getElementById("music-toggle");
     const musicIcon = document.getElementById("music-icon");
-  
+
     musicButton.addEventListener("click", () => {
       if (!isPlaying) {
         sound.loop(); // Loop the music
@@ -238,7 +288,7 @@ function affirmationParticles(p) {
   let cols;
   let field;
   let zoff = 0;
-  let particleNum = 200;
+  let particleNum = 100;
   let particles = [];
   let mic;
   let sensitivity;
@@ -246,7 +296,7 @@ function affirmationParticles(p) {
   let width = window.innerWidth;
   let height = window.innerHeight;
   p.setup = function () {
-    p.createCanvas(p.windowWidth, p.windowHeight);
+    let canvas= p.createCanvas(p.windowWidth, p.windowHeight);
     canvas.style("z-index", "-1"); // Ensure it stays in the background
     canvas.style("top", "0");
     canvas.style("left", "0");
@@ -347,4 +397,3 @@ function affirmationParticles(p) {
 
 // Run second p5 instance
 new p5(affirmationParticles);
-

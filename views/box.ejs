@@ -25,23 +25,26 @@
 
   <body>
     <%- include('navbar.ejs') %>
-    <div id="instructionModal" class="modal">
+    <div id="instructionModal" class="modal" >
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Welcome!</h2>
-        <p>This tool is designed to help you practice mindfulness and breathing exercises interactively. Follow the instructions below to get started:</p>
-        <ol>
-          <li><b>Adjust Your Preferences:</b> Use the sliders to set the duration for inhale, exhale, and hold phases.</li>
-          <li><b>Observe the Visuals:</b> Follow the moving circle as it guides your breathing phases.</li>
-          <li><b>Sync Your Breathing:</b> Inhale, hold, and exhale in rhythm with the visuals.</li>
-          <li><b>Modify and Experiment:</b> Adjust the sliders anytime to match your desired pace.</li>
-        </ol>
-        <p style="text-align: center;"><b>Tips:</b> Find a quiet space, focus on your breathing, and enjoy the journey!</p>
+        <div class="animate__animated animate__fadeInDown " >
+          <h2>Welcome!</h2>
+          <p>This tool is designed to help you practice mindfulness and breathing exercises interactively. Follow the instructions below to get started:</p>
+          <ol>
+            <li><b>Adjust Your Preferences:</b> Use the sliders to set the duration for inhale, exhale, and hold phases.</li>
+            <li><b>Observe the Visuals:</b> Follow the moving circle as it guides your breathing phases.</li>
+            <li><b>Sync Your Breathing:</b> Inhale, hold, and exhale in rhythm with the visuals.</li>
+            <li><b>Modify and Experiment:</b> Adjust the sliders anytime to match your desired pace.</li>
+          </ol>
+          <p style="text-align: center;"><b>Tips:</b> Find a quiet space, focus on your breathing, and enjoy the journey!</p>
+        </div>
+
         <button id="start-button">Got It, Let's Start!</button>
       </div>
     </div>
     
-    <h1 class=" animate__animated animate__bounceInDown">Box Breathing</h1>
+    <h1>Box Breathing</h1>
   
     <div class="durations">
         <div class="duration-label">
