@@ -38,8 +38,8 @@ body {
   h1 {
     position: absolute;
     font-family: var(--titleFont);
-    font-size: 4rem;
-    top: 20%;
+    font-size: 5rem;
+    top: 15%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;

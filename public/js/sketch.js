@@ -10,10 +10,14 @@ let fr;
 let particles = [];
 
 let flowField = [];
+let sound;
+let isPlaying = false;
+function preload() {
+  sound = loadSound('/sounds/track1.wav'); // Path to your sound file
+}
 
 function setup() {
   canvas= createCanvas(windowWidth, windowHeight);
-
   frameRate(30); // Lower frame rate for slower animation
   zoff = 0;
   scl = 40; // Increase scale for better visualization of flow lines
@@ -131,3 +135,21 @@ function windowResized() {
     cols = floor(width / scl);
     rows = floor(height / scl);
   }
+
+  window.onload = function () {
+    const musicButton = document.getElementById("music-toggle");
+    const musicIcon = document.getElementById("music-icon");
+  
+    musicButton.addEventListener("click", () => {
+      if (!isPlaying) {
+        sound.loop(); // Loop the music
+        musicIcon.classList.remove("fa-play");
+        musicIcon.classList.add("fa-pause");
+      } else {
+        sound.pause(); // Pause the music
+        musicIcon.classList.remove("fa-pause");
+        musicIcon.classList.add("fa-play");
+      }
+      isPlaying = !isPlaying; // Toggle the play state
+    });
+  };

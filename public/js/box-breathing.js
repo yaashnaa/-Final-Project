@@ -7,9 +7,15 @@ let phases = ['INHALE', 'HOLD', 'EXHALE', 'HOLD'];
 let breathText, holdText
 let phaseIndex = 0; 
 let sliderBreath, sliderHold; // Sliders for breath and hold duration
+let isPlaying = false;
+let sound
 
+function preload(){
+  sound = loadSound('/sounds/track3.wav');
+}
 function setup() {
-  createCanvas(600, 500);
+  let canvas=createCanvas(600, 500);
+  canvas.parent('container');
   circleX = width / 2 - squareSize / 2; // Start at the left side
   circleY = height / 2 - squareSize / 2;
   textAlign(CENTER, CENTER);
@@ -109,3 +115,20 @@ let currentPhase = phases[phaseIndex];
   
   }
 }
+window.onload = function () {
+  const musicButton = document.getElementById("music-toggle");
+  const musicIcon = document.getElementById("music-icon");
+
+  musicButton.addEventListener("click", () => {
+    if (!isPlaying) {
+      sound.loop(); // Loop the music
+      musicIcon.classList.remove("fa-play");
+      musicIcon.classList.add("fa-pause");
+    } else {
+      sound.pause(); // Pause the music
+      musicIcon.classList.remove("fa-pause");
+      musicIcon.classList.add("fa-play");
+    }
+    isPlaying = !isPlaying; // Toggle the play state
+  });
+};

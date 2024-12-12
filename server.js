@@ -26,8 +26,14 @@ app.get("/", (req, res) => {
 app.get("/box", (req, res) => {
   res.render("box");
 });
+app.get("/affirmations", (req, res) => {
+  res.render("affirmations");
+});
 app.get("/candle", (req, res) => {
   res.render("candle");
+});
+app.get("/navbar", (req, res) => {
+  res.render("navbar");
 });
 
 app.get("/mandala", (req, res) => {

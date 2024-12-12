@@ -25,9 +25,11 @@ let exhaleThreshold = 150;
 let inhaleConfidence = 0;
 let exhaleConfidence = 0;
 const confidenceThreshold = 8; // Number of frames required for state change
-
+let sound;
+let isPlaying = false;
 function preload() {
   handPose = ml5.handPose();
+  sound = loadSound("/sounds/track5.wav");
 }
 
 function setup() {
@@ -188,7 +190,7 @@ function drawKaleidoscope(indexFinger, thumb) {
 function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y);
 
-  let scaleFactor = map(distance, 30, 200, 1, 0.9);
+  let scaleFactor = map(distance, 70, 200, 1, 0.5);
   let targetPosX = (indexFinger.x - width / 2) * scaleFactor;
   let targetPosY = (indexFinger.y - height / 2) * scaleFactor;
 
@@ -203,6 +205,14 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   // Constrain the positions to prevent merging into one circle
   posX = constrain(posX, -width / 4, width / 4);
   posY = constrain(posY, -height / 4, height / 4);
+  let maxDistanceFromCenter = width / 2 ;
+  let distFromCenter = dist(posX, posY, width / 2, height / 2);
+
+  if (distFromCenter > maxDistanceFromCenter) {
+    let angleFromCenter = atan2(posY - height / 2, posX - width / 2);
+    posX = width / 2 + cos(angleFromCenter) * maxDistanceFromCenter;
+    posY = height / 2 + sin(angleFromCenter) * maxDistanceFromCenter;
+  }
 
   // Smooth size
   let targetSize = map(distance, 30, 200, 20, 100) * sizeFactor;
@@ -256,3 +266,21 @@ function adjustThresholds() {
     }
   }
 }
+
+window.onload = function () {
+  const musicButton = document.getElementById("music-toggle");
+  const musicIcon = document.getElementById("music-icon");
+
+  musicButton.addEventListener("click", () => {
+    if (!isPlaying) {
+      sound.loop(); // Loop the music
+      musicIcon.classList.remove("fa-play");
+      musicIcon.classList.add("fa-pause");
+    } else {
+      sound.pause(); // Pause the music
+      musicIcon.classList.remove("fa-pause");
+      musicIcon.classList.add("fa-play");
+    }
+    isPlaying = !isPlaying; // Toggle the play state
+  });
+};

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="./css/candle.css" />
+    <link rel="stylesheet" href="/css/navbar.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
@@ -15,9 +16,14 @@
       href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Playwrite+GB+S:ital,wght@0,100..400;1,100..400&family=Playwrite+IS:wght@100..400&family=Satisfy&family=Sofia&display=swap"
       rel="stylesheet"
     />
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
   </head>
 
   <body>
+    <%- include('navbar.ejs') %>
     <div id="instructionModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
@@ -36,7 +42,7 @@
         <button id="candleStartButton">Got It, Let’s Begin</button>
       </div>
     </div>
-    <h1>Candle Breathing</h1>
+    <h1 class=" animate__animated animate__fadeInLeft">Candle Breathing</h1>
     <div id="container">
       <div id="instructions">
         Click the button below to start the breathing exercise.
@@ -52,7 +58,7 @@
    
 
       <!-- FLAME -->
-      <canvas id="canvas"></canvas>
+      <canvas id="canvas" ></canvas>
     </div>
     <script src="/js/candleInst.js"></script>
     <script src="/js/candle.js"></script>

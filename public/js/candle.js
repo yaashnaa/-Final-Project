@@ -23,9 +23,11 @@ const instructionsElement = document.getElementById("instructions");
 const cycleInput = document.getElementById("cycles");
 
 let candleImg;
-
+let isPlaying = false;
+let sound
 function preload() {
   candleImg = loadImage("../images/candle.png");
+  sound = loadSound("../sounds/track4.wav");
 }
 
 function setup() {
@@ -212,3 +214,20 @@ function isBlowing() {
   lowpass = ALPHA * meter.volume + (1.0 - ALPHA) * lowpass;
   return lowpass > CANDLETHRESHOLD;
 }
+window.onload = function () {
+  const musicButton = document.getElementById("music-toggle");
+  const musicIcon = document.getElementById("music-icon");
+
+  musicButton.addEventListener("click", () => {
+    if (!isPlaying) {
+      sound.loop(); // Loop the music
+      musicIcon.classList.remove("fa-play");
+      musicIcon.classList.add("fa-pause");
+    } else {
+      sound.pause(); // Pause the music
+      musicIcon.classList.remove("fa-pause");
+      musicIcon.classList.add("fa-play");
+    }
+    isPlaying = !isPlaying; // Toggle the play state
+  });
+};

@@ -38,7 +38,7 @@ h1{
   animation-duration: 1s;
   margin: 0;
   position: absolute;
-  top: 3%;
+  top: 7%;
 }
 #instructions {
   font-size: 18px;
@@ -54,7 +54,7 @@ h1{
   gap: 15px;
   position: absolute;
   color: var(--text);
-  top: 15%;
+  top: 20%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin-top: 5rem;
@@ -112,12 +112,11 @@ h1{
 }
 #instructions {
   position: absolute;
-  top: 15%;
+  top: 20%;
   left: 50%;
   font-family: var(--mainFont);
   transform: translateX(-50%);
-  font-size: 18px; /* Adjust for readability */
-  color: black; /* Ensure it's visible against the background */
+  font-size: 18px; 
   z-index: 10; 
 }
 

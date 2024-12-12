@@ -16,11 +16,13 @@ let opacity = 255;
 let blinkThreshold = 3;
 let speedSlider; // Slider for speed control
 let speedMultiplier = 1; // Default speed multiplier
-
+let sound
+let isPlaying = false;
 let slider
 function preload() {
   // Load the faceMesh model
   faceMesh = ml5.faceMesh(options);
+  sound= loadSound('/sounds/track6.wav');
 }
 
 function setup() {
@@ -242,3 +244,20 @@ function windowResized() {
   visualiser.y = height / 2;
 }
 
+window.onload = function () {
+  const musicButton = document.getElementById("music-toggle");
+  const musicIcon = document.getElementById("music-icon");
+
+  musicButton.addEventListener("click", () => {
+    if (!isPlaying) {
+      sound.loop(); // Loop the music
+      musicIcon.classList.remove("fa-play");
+      musicIcon.classList.add("fa-pause");
+    } else {
+      sound.pause(); // Pause the music
+      musicIcon.classList.remove("fa-pause");
+      musicIcon.classList.add("fa-play");
+    }
+    isPlaying = !isPlaying; // Toggle the play state
+  });
+};
