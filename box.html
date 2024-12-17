@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-     <link rel="stylesheet" href="/css/navbar.css" />
-    <link rel="stylesheet" href="/css/box.css" />
+     <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/box.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
 
@@ -21,10 +21,23 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
   />
+  <script src="https://kit.fontawesome.com/4737a162b6.js" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <%- include('navbar.ejs') %>
+    <div class="navbar">
+      <a href="/" style="text-decoration: none; color: white">Home</a>
+      <a href="/candle.html" style="text-decoration: none; color: white">Candle</a>
+      <a href="/box.html" style="text-decoration: none; color: white">Box Breathing</a>
+      <a href="/affirmations.html" style="text-decoration: none; color: white"
+        >Affirmations</a
+      >
+      <a href="/mandala.html" style="text-decoration: none; color: white">Mandala</a>
+      <a href="/kaledioscope.html" style="text-decoration: none; color: white">Kaledioscope</a>
+      <button id="music-toggle" class="music-btn">
+        <i id="music-icon" class="fas fa-play"></i> Music
+      </button>
+    </div>
     <div id="instructionModal" class="modal" >
       <div class="modal-content">
         <span class="close-button">&times;</span>
@@ -63,7 +76,7 @@
       </div>
     </div>
     <div id="container"> </div>
-    <script src="/js/script.js"></script>
-    <script src="/js/box-breathing.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/box-breathing.js"></script>
   </body>
 </html>

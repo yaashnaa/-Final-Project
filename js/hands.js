@@ -58,7 +58,7 @@ function draw() {
       fingerDistances.reduce((a, b) => a + b, 0) / fingerDistances.length;
     distanceHistory.push(averageDistance);
     if (distanceHistory.length > smoothingWindow) {
-      distanceHistory.shift(); 
+      distanceHistory.shift();
     }
     if (leftHand) {
       let leftIndexFinger = leftHand.keypoints[8];
@@ -77,7 +77,7 @@ function draw() {
           cycleCount++;
         }
         lastState = "Exhale";
-        exhaleConfidence = 0; 
+        exhaleConfidence = 0;
       }
     } else if (smoothedDistance <= inhaleThreshold) {
       inhaleConfidence++;
@@ -180,6 +180,9 @@ function drawKaleidoscope(indexFinger, thumb) {
     pop();
   }
 }
+
+// AI assistance for using the lerp() function and maintaining a history of distances to ensure stable transitions between states.
+
 function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y);
 
@@ -194,10 +197,9 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   posX = lerp(posX, targetPosX, 0.1);
   posY = lerp(posY, targetPosY, 0.1);
 
-  
   posX = constrain(posX, -width / 4, width / 4);
   posY = constrain(posY, -height / 4, height / 4);
-  let maxDistanceFromCenter = width / 2 ;
+  let maxDistanceFromCenter = width / 2;
   let distFromCenter = dist(posX, posY, width / 2, height / 2);
 
   if (distFromCenter > maxDistanceFromCenter) {
@@ -219,7 +221,6 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   ellipse(posX, posY, size, size);
 }
 
-
 function gotHands(results) {
   hands = results;
 }
@@ -233,7 +234,7 @@ function getColorFromPosition(finger) {
 
   return [r, g, b];
 }
-
+// The logic for dynamically calculating the inhaleThreshold and exhaleThreshold was suggested during an AI conversation. The AI recommended analyzing the minimum and maximum values of recent finger distances to adjust thresholds adaptively.
 function adjustThresholds() {
   if (distanceHistory.length > 0) {
     let minDistance = Math.min(...distanceHistory);
@@ -263,11 +264,11 @@ window.onload = function () {
 
   musicButton.addEventListener("click", () => {
     if (!isPlaying) {
-      sound.loop(); 
+      sound.loop();
       musicIcon.classList.remove("fa-play");
       musicIcon.classList.add("fa-pause");
     } else {
-      sound.pause(); 
+      sound.pause();
       musicIcon.classList.remove("fa-pause");
       musicIcon.classList.add("fa-play");
     }

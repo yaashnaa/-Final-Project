@@ -71,7 +71,7 @@ function affirmationSketch(p) {
   let isPlaying = false;
   p.preload = function () {
     sound = p.loadSound(
-      "/sounds/track2.wav",
+      "/2.wav",
       () => {
         console.log("Sound loaded successfully.");
       },
