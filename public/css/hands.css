@@ -18,10 +18,10 @@ body {
   }
   
   #canvas-container {
-    position: relative; /* Position elements relative to this container */
-    width: 100vw; /* Full width of the viewport */
-    height: 100vh; /* Full height of the viewport */
-    overflow: hidden; /* Prevent elements from overflowing */
+    position: relative;
+    width: 100vw; 
+    height: 100vh; 
+    overflow: hidden; 
   }
   
   canvas {

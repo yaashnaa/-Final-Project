@@ -1,173 +1,167 @@
 let faceMesh;
 let video;
 let faces = [];
-let options = { maxFaces: 1, refineLandmarks: false, flipHorizontal: false };
+let options = { maxFaces: 1, refineLandmarks: true, flipHorizontal: true };
 let angle;
-let gen = 80; // Starting value for the flower animation
+let gen = 80;
 let visualiser;
 let visualiserContainer;
 let visualiserVisible = false;
 let expanding = true;
 let countdown = 5;
 let timer = 0;
-let breathingState = "Breathe in"; // Start with "Breathe in"
+let breathingState = "Breathe in";
 let opacity = 255;
-// Threshold for detecting blink (adjust if needed)
 let blinkThreshold = 3;
-let speedSlider; // Slider for speed control
-let speedMultiplier = 1; // Default speed multiplier
-let sound
+let speedSlider;
+let speedMultiplier = 1;
+let sound;
 let isPlaying = false;
-let slider
+let slider;
+let baselineSet = false;
+let loading = true;
+let baselineMouthOpenDist = null;
+let baselineEyeToEyebrowDist = null;
+let stateCounter = 0;
+const STABLE_FRAMES = 10;
+let currentState = "neutral";
 function preload() {
-  // Load the faceMesh model
   faceMesh = ml5.faceMesh(options);
-  sound= loadSound('/sounds/track6.wav');
+  sound = loadSound("/sounds/track6.wav");
 }
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont("Satisfy");
 
   visualiserContainer = document.getElementById("visualiser");
-  slider= document.getElementById("slider");
-  // Ensure element exists
+  slider = document.getElementById("slider");
   if (visualiserContainer) {
-    console.log("Visualizer element found"); // Log for debugging
+    console.log("Visualizer element found");
   } else {
     console.error("Visualizer element not found");
   }
-  speedSlider = createSlider(0.5, 5, 1, 0.1); // Min: 0.5, Max: 5, Default: 1, Step: 0.1
-  speedSlider.style("width", "200px"); // Set the slider width
-  // Choose RGB color mode to match your original code
+  speedSlider = createSlider(0.5, 5, 1, 0.1);
+  speedSlider.style("width", "200px");
+  
   colorMode(RGB);
-  speedSlider.parent(slider); // Attach the slider to the visualizer div
-  // Create the webcam video and hide it
+  speedSlider.parent(slider);
   video = createCapture(VIDEO);
   video.size(640, 480);
   video.hide();
-
-  // Start detecting faces from the webcam video
   faceMesh.detectStart(video, gotFaces);
 
-  let canvas = createCanvas(windowWidth, windowHeight); // Create a p5.js canvas
-  canvas.parent(visualiserContainer); // Attach the canvas to the visualizer div
-
+  let canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent(visualiserContainer);
   // Set the initial visualizer
   visualiser = new Visualiser(114, 166, 144);
-  visualiserContainer.style.display = "none";
-
+  visualiserContainer.style.display = "block";
+  visualiserContainer.style.opacity = 1;
 }
 
 function draw() {
-  background(11, 5, 8); // Deep blue background
+  background(11, 5, 8);
   clear();
 
-  speedMultiplier= speedSlider.value(); // Update the speed multiplier
+  speedMultiplier = speedSlider.value();
   if (visualiserContainer.style.display === "block") {
-    visualiser.display(); // Draw the visualizer
+    visualiser.display();
   }
   timer += deltaTime;
 
-  showVisualiser();
-  checkFacialPoints();
+  if (!baselineSet && faces.length > 0) {
+    setBaseline();
+    baselineSet = true;
+    console.log("Baseline set successfully!");
+  }
+  if (baselineSet) {
+    checkFacialPoints();
+  }
 }
-function showVisualiser() {
-  const visualiserEl = document.getElementById("visualiser");
-  setTimeout(() => {
-    if (visualiserEl) {
-      visualiserEl.style.display = "block"; // Make the div visible
-      setTimeout(() => {
-        visualiserEl.style.opacity = 1; // Fade it in after it's visible
-      }, 2); // Small delay to allow the opacity change to kick in afte
+function setBaseline() {
+  if (!baselineSet && faces.length > 0) {
+    let face = faces[0];
+    let upperLip = face.keypoints[13];
+    let lowerLip = face.keypoints[14];
+    let leftEyebrow = face.keypoints[105];
+    let leftEye = face.keypoints[159];
+
+    if (upperLip && lowerLip && leftEyebrow && leftEye) {
+      baselineMouthOpenDist = dist(
+        upperLip.x,
+        upperLip.y,
+        lowerLip.x,
+        lowerLip.y
+      );
+
+      baselineEyeToEyebrowDist = dist(
+        leftEyebrow.x,
+        leftEyebrow.y,
+        leftEye.x,
+        leftEye.y
+      );
+
+      // console.log("Baseline mouth open dist:", baselineMouthOpenDist);
+      // console.log("Baseline eye to eyebrow dist:", baselineEyeToEyebrowDist);
     } else {
-      console.log("not found");
+      console.error("Keypoints not available yet");
     }
-  });
+  } else {
+    console.error("No face detected");
+  }
 }
 
 function checkFacialPoints() {
-  if (faces.length > 0) {
+  if (!visualiser) return;
+  if (faces.length > 0 && baselineMouthOpenDist && baselineEyeToEyebrowDist) {
+    // console.log('checking facial points');
     let face = faces[0];
     let leftEyebrow = face.keypoints[105];
     let leftEye = face.keypoints[159];
     let lowerLeftEyelid = face.keypoints[145];
-    let upperLip = face.keypoints[13]; // Top of the upper lip
-    let lowerLip = face.keypoints[14]; // Bottom of the lower lip
-    // Retrieve keypoints for the nose and mouth
-    let noseBridge = face.keypoints[6]; // Top of the nose bridge
-    let leftNostril = face.keypoints[98]; // Left nostril
-    let rightNostril = face.keypoints[327]; // Right nostril
+    let upperLip = face.keypoints[13];
+    let lowerLip = face.keypoints[14];
+
     let eyeToEyebrowDist = dist(
       leftEyebrow.x,
       leftEyebrow.y,
       leftEye.x,
       leftEye.y
     );
-    let eyeOpenDist = dist(
-      leftEye.x,
-      leftEye.y,
-      lowerLeftEyelid.x,
-      lowerLeftEyelid.y
-    ); // Eye open distance
-    let leftMouthCorner = face.keypoints[61]; // Left corner of the mouth
-    let rightMouthCorner = face.keypoints[291]; // Right corner of the mouth
     let mouthOpenDist = dist(upperLip.x, upperLip.y, lowerLip.x, lowerLip.y);
 
-    // Calculate distances for nose scrunch detection
-    let noseScrunchDist = dist(
-      noseBridge.x,
-      noseBridge.y,
-      (leftNostril.x + rightNostril.x) / 2,
-      (leftNostril.y + rightNostril.y) / 2
-    );
+    let mouthOpenRatio = mouthOpenDist / baselineMouthOpenDist;
+    let eyebrowRatio = eyeToEyebrowDist / baselineEyeToEyebrowDist;
 
-    // Calculate horizontal distance between mouth corners (mouth movement sideways)
-    let mouthHorizontalDist = dist(
-      leftMouthCorner.x,
-      leftMouthCorner.y,
-      rightMouthCorner.x,
-      rightMouthCorner.y
-    );
-
-    // Calculate vertical distance between upper and lower lips (mouth movement up or down)
-    let mouthVerticalDist = dist(
-      upperLip.x,
-      upperLip.y,
-      lowerLip.x,
-      lowerLip.y
-    );
-    if (eyeOpenDist < blinkThreshold) {
-      console.log("blink detected - ignoring");
-      visualiser.setColor(204, 232, 204);
-      // return; // Skip frame when a blink is detected
+    let newState = "neutral";
+    if (mouthOpenRatio > 1.5) {
+      newState = "mouth open";
+    } else if (eyebrowRatio > 1.3) {
+      newState = "eyebrows raised";
+    } else if (eyebrowRatio < 0.85) {
+      newState = "eyebrows lowered";
     }
-
-    // Facial expression handling
-    if (eyeToEyebrowDist < 20 && eyeToEyebrowDist > 10) {
-      console.log("frowning");
-      visualiser.setColor(255, 150, 150); // Set jagged colors
-    } else if (noseScrunchDist < 20) {
-      //   console.log("Nose scrunched");
-      visualiser.setColor(255, 150, 150); // Set specific colors for nose scrunch
-    } else if (mouthHorizontalDist < 40) {
-      //   console.log("Mouth moved sideways");
-      visualiser.setColor(255, 150, 150); // Set specific colors for sideways mouth movement
-    } else if (eyeToEyebrowDist > 40) {
-      console.log("raised eyebrows - stressed/surprised");
-      visualiser.setColor(255, 150, 150); // Set jagged colors
-    } else if (mouthOpenDist < 10) {
-      console.log("smooth - relaxed");
-      visualiser.setColor(114, 166, 144); // Set smooth colors
-    } else if (mouthOpenDist > 15) {
-      console.log("mouth open - jagged");
-      visualiser.setColor(255, 150, 150); // Set jagged colors
-    } else if (mouthVerticalDist > 15) {
-      //   console.log("Mouth moved up or down");
-      visualiser.setColor(255, 150, 150); // Set specific colors for vertical mouth movement
+    if (newState === currentState) {
+      stateCounter = 0;
     } else {
-      console.log("neutral");
-      visualiser.setColor(114, 166, 144); // Set neutral/smooth colors
+      stateCounter++;
+      if (stateCounter >= STABLE_FRAMES) {
+        currentState = newState;
+        stateCounter = 0;
+        // console.log("State changed to:", currentState);
+        switch (currentState) {
+          case "mouth open":
+            visualiser.setColor(204, 102, 102); // red for mouth open
+            break;
+          case "eyebrows raised":
+            visualiser.setColor(204, 102, 102); // red for raised eyebrows
+            break;
+          case "eyebrows lowered":
+            visualiser.setColor(204, 102, 102); //  red for lowered eyebrows
+            break;
+          default:
+            visualiser.setColor(114, 166, 144); // Green for neutral
+        }
+      }
     }
   }
 }
@@ -182,12 +176,6 @@ class Visualiser {
     this.y = height / 2;
   }
 
-  // Method to adjust `gen` based on `mouseX` value
-  // setGen(mouseX) {
-  //   // Map the `mouseX` value to a reasonable range for `gen`
-  //   this.gen = map(mouseX, 0, width, 10, 100);
-  // }
-
   setColor(r, g, b) {
     this.r = r;
     this.g = g;
@@ -196,12 +184,11 @@ class Visualiser {
 
   display() {
     // let scaleFactor = map(mouseX, 0, width, 0.5, 1.5);
-  
     this.applyGlowEffect();
 
     stroke(this.r, this.g, this.b);
     strokeWeight(1);
-    fill(this.r, this.g, this.b, 50); // Soft fill for the curves
+    fill(this.r, this.g, this.b, 50);
 
     angle = sin(this.gen * 44) * 44;
 
@@ -215,28 +202,27 @@ class Visualiser {
     }
     pop();
 
-    this.gen += 0.0003 * speedMultiplier// Increment for noticeable animation
+    this.gen += 0.0003 * speedMultiplier;
   }
+
   applyGlowEffect() {
-    // Rotate and draw glowing circles
     push();
     translate(this.x, this.y);
-    rotate(this.gen * 2); // Apply the same rotation as the flower
+    rotate(this.gen * 2);
 
     for (let glow = 0; glow < 10; glow++) {
       stroke(this.r, this.g, this.b, 255 - glow * 25);
       strokeWeight(2);
       noFill();
-      ellipse(0, 0, glow * this.gen * 0.5); // Draw ellipses around the center
+      ellipse(0, 0, glow * this.gen * 0.5);
     }
 
     pop();
   }
 }
-
-// Callback function when faceMesh outputs data
 function gotFaces(results) {
   faces = results;
+  // console.log(faces);
 }
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -258,6 +244,6 @@ window.onload = function () {
       musicIcon.classList.remove("fa-pause");
       musicIcon.classList.add("fa-play");
     }
-    isPlaying = !isPlaying; // Toggle the play state
+    isPlaying = !isPlaying;
   });
 };

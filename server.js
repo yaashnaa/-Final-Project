@@ -2,11 +2,11 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const port= 3000
-// Middleware
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Set the directory for EJS templates and static files
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -44,5 +44,4 @@ app.get("/kaledioscope", (req, res) => {
   res.render("hands");
 });
 
-// Export the app for Vercel
 module.exports = app;

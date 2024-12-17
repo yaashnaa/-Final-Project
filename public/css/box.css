@@ -21,8 +21,6 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-
-/* Container for Sketch and Controls */
 #container {
   text-align: center;
   position: relative;
@@ -35,7 +33,7 @@ body {
   gap: 2rem;
   font-size: 1.5rem;
 }
-/* Sliders Container */
+
 #controls {
   margin-top: 20px;
   display: flex;
@@ -51,7 +49,7 @@ body {
   align-items: center;
   z-index: 999;
 }
-/* Slider Labels */
+
 .slider-label {
   font-size: 1.2rem;
   margin-top: 1rem;
@@ -103,9 +101,8 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
-/* Modal Background */
 .modal {
-  display: none; /* Hidden by default */
+  display: none; 
   position: fixed;
   z-index: 1000;
   left: 50%;
@@ -114,14 +111,14 @@ input[type="range"]::-moz-range-thumb {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.8); /* Black with transparency */
+  background-color: rgba(0, 0, 0, 0.8); 
   align-items: center;
   justify-content: center;
 }
 h2{
   text-align: center;
 }
-/* Modal Content */
+
 .modal-content {
   background-color: rgb(101, 165, 176);
   margin: auto;
@@ -134,7 +131,6 @@ h2{
   font-family: var(--mainFont);
 }
 
-/* Close Button */
 .close-button {
   color: #000000;
   float: right;
@@ -153,7 +149,7 @@ li{
   text-align: left;
 }
 
-/* CSS */
+
 #start-button {
   background-color: #e1ecf4;
   border-radius: 3px;

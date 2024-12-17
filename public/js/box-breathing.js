@@ -16,7 +16,7 @@ function preload(){
 function setup() {
   let canvas=createCanvas(600, 500);
   canvas.parent('container');
-  circleX = width / 2 - squareSize / 2; // Start at the left side
+  circleX = width / 2 - squareSize / 2; 
   circleY = height / 2 - squareSize / 2;
   textAlign(CENTER, CENTER);
   textSize(24);
@@ -43,7 +43,7 @@ function setup() {
 }
 
 function draw() {
-  background(11, 5, 8); // Deep blue background
+  background(11, 5, 8); 
 
   // Update duration values from sliders
   duration = sliderBreath.value() *60;
@@ -121,7 +121,7 @@ window.onload = function () {
 
   musicButton.addEventListener("click", () => {
     if (!isPlaying) {
-      sound.loop(); // Loop the music
+      sound.loop(); 
       musicIcon.classList.remove("fa-play");
       musicIcon.classList.add("fa-pause");
     } else {
@@ -129,6 +129,6 @@ window.onload = function () {
       musicIcon.classList.remove("fa-pause");
       musicIcon.classList.add("fa-play");
     }
-    isPlaying = !isPlaying; // Toggle the play state
+    isPlaying = !isPlaying;
   });
 };

@@ -53,16 +53,12 @@ function draw() {
     instructions(false);
     let rightHand = hands[0];
     let leftHand = hands.length > 1 ? hands[1] : null;
-
-    // Check distances between relevant keypoints for all fingers
     let fingerDistances = checkFingerDistances(rightHand);
-
-    // Determine if the hand is closed based on the average distance of fingers
     let averageDistance =
       fingerDistances.reduce((a, b) => a + b, 0) / fingerDistances.length;
     distanceHistory.push(averageDistance);
     if (distanceHistory.length > smoothingWindow) {
-      distanceHistory.shift(); // Keep the history within the smoothing window
+      distanceHistory.shift(); 
     }
     if (leftHand) {
       let leftIndexFinger = leftHand.keypoints[8];
@@ -81,7 +77,7 @@ function draw() {
           cycleCount++;
         }
         lastState = "Exhale";
-        exhaleConfidence = 0; // Reset after state change
+        exhaleConfidence = 0; 
       }
     } else if (smoothedDistance <= inhaleThreshold) {
       inhaleConfidence++;
@@ -93,13 +89,11 @@ function draw() {
           cycleCount++;
         }
         lastState = "Inhale";
-        inhaleConfidence = 0; // Reset after state change
+        inhaleConfidence = 0;
       }
     }
     fill(255);
     textSize(16);
-
-    // Display breathing state and update visuals
     displayBreathingState(state, cycleCount);
     drawKaleidoscope(rightHand.keypoints[8], rightHand.keypoints[4]);
   } else {
@@ -152,7 +146,6 @@ function instructions(visible) {
   }
 }
 
-// Function to display the breathing state and cycle count
 function displayBreathingState(state, cycleCount) {
   fill(255);
   textSize(24);
@@ -194,7 +187,6 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   let targetPosX = (indexFinger.x - width / 2) * scaleFactor;
   let targetPosY = (indexFinger.y - height / 2) * scaleFactor;
 
-  // Initialize posX and posY if undefined
   if (typeof posX === "undefined") posX = targetPosX;
   if (typeof posY === "undefined") posY = targetPosY;
 
@@ -202,7 +194,7 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   posX = lerp(posX, targetPosX, 0.1);
   posY = lerp(posY, targetPosY, 0.1);
 
-  // Constrain the positions to prevent merging into one circle
+  
   posX = constrain(posX, -width / 4, width / 4);
   posY = constrain(posY, -height / 4, height / 4);
   let maxDistanceFromCenter = width / 2 ;
@@ -217,13 +209,11 @@ function drawPattern(indexFinger, thumb, brightness, sizeFactor) {
   // Smooth size
   let targetSize = map(distance, 30, 200, 20, 100) * sizeFactor;
   size = lerp(size || targetSize, targetSize, 0.1);
-  size = constrain(size, 20, 100); // Constrain size between 20 and 100
+  size = constrain(size, 20, 100);
 
   // Smooth brightness
   let targetBrightness = map(mouseY, 0, height, 50, 255);
   brightness = lerp(brightness || targetBrightness, targetBrightness, 0.1);
-
-  // Draw the pattern
   fill(color[0], color[1], brightness, 150);
   noStroke();
   ellipse(posX, posY, size, size);
@@ -273,14 +263,14 @@ window.onload = function () {
 
   musicButton.addEventListener("click", () => {
     if (!isPlaying) {
-      sound.loop(); // Loop the music
+      sound.loop(); 
       musicIcon.classList.remove("fa-play");
       musicIcon.classList.add("fa-pause");
     } else {
-      sound.pause(); // Pause the music
+      sound.pause(); 
       musicIcon.classList.remove("fa-pause");
       musicIcon.classList.add("fa-play");
     }
-    isPlaying = !isPlaying; // Toggle the play state
+    isPlaying = !isPlaying;
   });
 };

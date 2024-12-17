@@ -1,4 +1,4 @@
-// Select modal elements
+
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("instructionModal");
   const closeButton = document.querySelector(".close-button");
@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const candleStartButton = document.getElementById("candleStartButton");
 
   window.onload = () => {
-    modal.style.display = "flex"; // Show the modal as a flex container
+    modal.style.display = "flex"; 
   };
 
   closeButton.onclick = () => {
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = "none";
   };
 
-  // Close modal if user clicks outside the modal content
+
   window.onclick = (event) => {
     if (event.target === modal) {
       modal.style.display = "none";

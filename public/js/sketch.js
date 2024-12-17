@@ -13,14 +13,14 @@ let flowField = [];
 let sound;
 let isPlaying = false;
 function preload() {
-  sound = loadSound('/sounds/track1.wav'); // Path to your sound file
+  sound = loadSound('/sounds/track1.wav'); 
 }
 
 function setup() {
   canvas= createCanvas(windowWidth, windowHeight);
-  frameRate(30); // Lower frame rate for slower animation
+  frameRate(30); 
   zoff = 0;
-  scl = 40; // Increase scale for better visualization of flow lines
+  scl = 40;
   inc = 0.1;
   cols = floor(width / scl);
   rows = floor(height / scl);
@@ -30,13 +30,13 @@ function setup() {
     particles[i] = new Particle(random(width), random(height));
   }
   
-  background(0); // Black background for contrast
+  background(0); 
 }
 function mousePressed() {
     noiseSeed(millis())
   }
 function draw() {
-  background(0, 20); // Slight transparency for trailing effect
+  background(0, 20); 
   
   let yoff = 0;
   for (let y = 0; y < rows; y++) {
@@ -49,25 +49,24 @@ function draw() {
       let v = p5.Vector.fromAngle(angle);
       v.setMag(0.5);
 
-      // Modify flow field vectors near the mouse
+
       let mousePos = createVector(mouseX, mouseY);
       let gridPos = createVector(x * scl, y * scl);
       let distance = mousePos.dist(gridPos);
-      if (distance < 100) { // Interaction radius
+      if (distance < 100) { 
         let repelForce = p5.Vector.sub(gridPos, mousePos);
-        repelForce.setMag(map(distance, 0, 500, 1, 0)); // Adjust repel strength
+        repelForce.setMag(map(distance, 0, 500, 1, 0)); 
         v.add(repelForce);
       }
       
       flowField[index] = v;
 
-      // Draw flow field vectors
-      stroke(216, 158, 179, 150); // Light blue for flow field lines
+      stroke(216, 158, 179, 150); 
       strokeWeight(0.05);
       push();
       translate(x * scl, y * scl);
       rotate(v.heading());
-      line(0, 0, scl / 2, 0); // Line representing the vector
+      line(0, 0, scl / 2, 0);
       pop();
 
       xoff += inc;
@@ -76,8 +75,6 @@ function draw() {
   }
   
   zoff += 0.0002;
-
-  // Update and display particles
   for (let i = 0; i < particles.length; i++) {
     particles[i].follow(flowField);
     particles[i].update();
@@ -93,8 +90,8 @@ class Particle {
     this.pos = createVector(x,y);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
-    this.maxSpeed = 4; // Adjust speed for slower movement
-    this.color = color(216, 158, 179); // Random colors
+    this.maxSpeed = 4; 
+    this.color = color(216, 158, 179); 
   }
 
   follow(vectors) {
@@ -131,7 +128,7 @@ class Particle {
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight); // Adjust canvas size when the window is resized
+    resizeCanvas(windowWidth, windowHeight); 
     cols = floor(width / scl);
     rows = floor(height / scl);
   }

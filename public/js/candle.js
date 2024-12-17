@@ -47,7 +47,6 @@ function setup() {
   fft = new p5.FFT();
   fft.setInput(mic);
 
-  // Handle Button Click to Start
   startButton1.addEventListener("click", () => {
     const cycleInput = document.getElementById("cycles");
     remainingCycles = parseInt(cycleInput.value) || 0;
@@ -89,8 +88,6 @@ function draw() {
       }
     }
   }
-
-  // candle image
   imageMode(CENTER);
   image(candleImg, width / 2, height / 2 + 100, 500, 800);
 
@@ -157,7 +154,7 @@ class FlameParticle {
 
   respawn() {
     this.x = width / 2;
-    this.y = flameStartY; // Adjust position to be above the candle
+    this.y = flameStartY;
     this.radius = random(10, 15);
     this.life = random(50, 100);
     this.curLife = this.life;
