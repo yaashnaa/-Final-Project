@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-     "build": "echo 'No build required'",
+    "build": "echo 'No build required'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,10 +14,7 @@
     "@ngrok/ngrok": "^1.4.1",
     "animate.css": "^4.1.1",
     "ejs": "^3.1.10",
-    "express": "^4.21.1",
-    "helmet": "^8.0.0",
-    "http": "^0.0.1-security",
-    "live-server": "^1.2.2"
+    "express": "^4.21.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.9",
